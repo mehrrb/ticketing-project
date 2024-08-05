@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Ticket
 from rest_framework.response import Response
 from .serializers import TicketSerializer
-from rest_framework.authentication import BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import action
 
 
@@ -12,7 +12,7 @@ from rest_framework.decorators import action
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    authentication_classes = [BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
         

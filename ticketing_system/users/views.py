@@ -6,9 +6,9 @@ from .models import Users
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+
 
 
 class UsersView(ModelViewSet):
@@ -19,7 +19,7 @@ class UsersView(ModelViewSet):
 
 class LoginView(APIView):
     
-    authentication_classes = [BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
     def post(self,request):
@@ -42,7 +42,7 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
-    authentication_classes = [BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
     def post(self,request):
