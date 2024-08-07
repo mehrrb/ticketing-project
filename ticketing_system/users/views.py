@@ -15,15 +15,27 @@ import traceback
 
 class UsersView(ModelViewSet):
     queryset = Users.objects.all()
-    
-    
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return LoginSerializer
+    serializer_class = UserSerializer    
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        ser_data = UserSerializer(data=data)
+        if ser_data.is_valid():
+            email = ser_data.validated_data['email']
+            password = ser_data.validated_data['password']
+            
+            user = Users(
+                email = email,            
+            )
+            user.set_password(password)
+            user.save()
+            return Response({"info" : "successfully created"}, status=status.HTTP_201_CREATED)
         else:
-            return UserSerializer
+            return Response(ser_data.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
+    
+
 class LoginView(APIView):
     
     

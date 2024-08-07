@@ -10,20 +10,18 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
-        
-
-        
-    def create(self, validated_data):
-        user = Users(
-            email=validated_data['email'],
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
     
     
-class LoginSerializer(serializers.ModelSerializer):
+        
+    # def create(self, validated_data):
+    #     user = Users(
+    #         email=validated_data['email'],
+    #     )
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     return user
 
-    class Meta:
-        model = Users
-        fields = '__all__'
+    
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
