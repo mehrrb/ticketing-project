@@ -48,7 +48,7 @@ class TicketViewSet(viewsets.ModelViewSet):
         
         if user.is_superuser:
             ticket.is_read_by_admin = True
-            ticket.reply = request.data.get('reply', ticket.reply)
+            ticket.reply = request.data.get('reply', None)
         else:
             if not ticket.reply:
                 return Response({'error':'wait for admin...'},status=status.HTTP_204_NO_CONTENT)
