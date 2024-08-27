@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .serializers import TicketSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 
@@ -12,6 +14,8 @@ from rest_framework.decorators import action
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['description']
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     

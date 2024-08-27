@@ -56,7 +56,11 @@ class LoginView(APIView):
                     response = {}
                     response = ser_user.data
                     response['access_token'] = access_token
-                    response['refresh_token'] = refresh_token     
+                    response['refresh_token'] = refresh_token
+                    if user.is_superuser:
+                        response['is_superuser'] = True  
+                    else:
+                        response['is_superuser'] = False
                     return Response(response, status=status.HTTP_200_OK)
                 else:
                     return Response(ser_user.errors, status=status.HTTP_400_BAD_REQUEST)
