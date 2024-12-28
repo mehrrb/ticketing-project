@@ -65,20 +65,9 @@ class TicketViewSet(viewsets.ModelViewSet):
         
         if user.is_superuser:
             ticket.is_read_by_admin = True
-            old_status = ticket.status
             serialized_data = TicketSerializer(ticket, data=request.data, partial=True)
             if serialized_data.is_valid():
                 ticket = serialized_data.save()
-                
-                # Create notification if status changed
-                if old_status != ticket.status:
-                    Notification.objects.create(
-                        user=ticket.user,
-                        ticket=ticket,
-                        notification_type='status_change',
-                        message=f'Ticket status changed to {ticket.get_status_display()}'
-                    )
-                
                 return Response({'info': 'updated successfully'}, status=status.HTTP_200_OK)
         else:
             if not ticket.reply:

@@ -51,4 +51,9 @@ class Ticket(models.Model):
     is_read_by_admin = models.BooleanField(default=False)
     reply = models.TextField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_status = self.status
+        self._original_reply = self.reply
     

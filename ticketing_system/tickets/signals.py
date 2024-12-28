@@ -13,10 +13,19 @@ def create_ticket_notification(sender, instance, created, **kwargs):
                 notification_type='ticket_assigned',
                 message=f'New ticket created: {instance.title}'
             )
-    elif instance.reply and instance.reply != instance._original_reply:
-        Notification.objects.create(
-            user=instance.user,
-            ticket=instance,
-            notification_type='ticket_reply',
-            message='Your ticket has received a reply'
-        ) 
+    else:
+        if hasattr(instance, '_original_status') and instance.status != instance._original_status:
+            Notification.objects.create(
+                user=instance.user,
+                ticket=instance,
+                notification_type='status_change',
+                message=f'Ticket status changed to {instance.get_status_display()}'
+            )
+        
+        if hasattr(instance, '_original_reply') and instance.reply and instance.reply != instance._original_reply:
+            Notification.objects.create(
+                user=instance.user,
+                ticket=instance,
+                notification_type='ticket_reply',
+                message='Your ticket has received a reply'
+            ) 
