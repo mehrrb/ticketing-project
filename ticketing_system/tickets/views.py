@@ -80,7 +80,7 @@ class TicketViewSet(viewsets.ModelViewSet):
         old_status = self.get_object().status
         ticket = serializer.save()
         
-        # ایجاد اعلان برای تغییر وضعیت
+        
         if old_status != ticket.status:
             Notification.objects.create(
                 user=ticket.user,
