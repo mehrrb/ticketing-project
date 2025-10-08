@@ -1,13 +1,13 @@
-from django.urls import path,include
 from rest_framework.routers import SimpleRouter
-from .views import TicketViewSet, CategoryViewSet, NotificationViewSet
+
+from .views import CategoryViewSet, NotificationViewSet, TicketViewSet
 
 router = SimpleRouter()
-router.register('ticket',TicketViewSet)
-router.register('categories',CategoryViewSet)
-router.register('notifications',NotificationViewSet,basename='notification')
+router.register("ticket", TicketViewSet)
+router.register("categories", CategoryViewSet)
+router.register("notifications", NotificationViewSet, basename="notification")
 
-app_name = 'tickets'
+app_name = "tickets"
 
 urlpatterns = []
 
