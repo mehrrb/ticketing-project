@@ -11,6 +11,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 import logging
 import traceback
+import os
 
 
 class UsersView(ModelViewSet):
@@ -39,36 +40,69 @@ class UsersView(ModelViewSet):
 class LoginView(APIView):
     
     
-    def post(self,request):
+    def post(self, request):
         try:
-            
             email = request.data.get('email')
             password = request.data.get('password')
-            user = Users.objects.get(email=email)
-            check_password = user.check_password(password)
-            if check_password:
-                ser_user = LoginSerializer(data=request.data)
-                if ser_user.is_valid():
-                    token = RefreshToken.for_user(user)
-                    access_token = str(token.access_token)
-                    refresh_token = str(token)
-                    login(request, user)
-                    response = {}
-                    response = ser_user.data
-                    response['access_token'] = access_token
-                    response['refresh_token'] = refresh_token
-                    if user.is_superuser:
-                        response['is_superuser'] = True  
-                    else:
-                        response['is_superuser'] = False
-                    return Response(response, status=status.HTTP_200_OK)
-                else:
-                    return Response(ser_user.errors, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({"error": "wrong password"}, status=status.HTTP_400_BAD_REQUEST)
-        except:
-            logging.error(traceback.format_exc())
-            return Response({"error": "user not valid"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if not email or not password:
+                return Response(
+                    {"error": "Email and password are required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if '@' not in email or '.' not in email:
+                return Response(
+                    {"error": "Invalid email format"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                user = Users.objects.get(email=email)
+            except Users.DoesNotExist:
+                return Response(
+                    {"error": "Invalid credentials"}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            if not user.check_password(password):
+                return Response(
+                    {"error": "Invalid credentials"}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            # Validate serializer
+            ser_user = LoginSerializer(data=request.data)
+            if not ser_user.is_valid():
+                return Response(ser_user.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Generate tokens
+            token = RefreshToken.for_user(user)
+            access_token = str(token.access_token)
+            refresh_token = str(token)
+            
+            # Login user
+            login(request, user)
+            
+            # Prepare response
+            response = ser_user.data.copy()
+            response['access_token'] = access_token
+            response['refresh_token'] = refresh_token
+            response['is_superuser'] = user.is_superuser
+            
+            return Response(response, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            # Log the actual error for debugging (only in development)
+            if os.getenv('DEBUG', 'False').lower() == 'true':
+                logging.error(f"Login error: {str(e)}")
+                logging.error(traceback.format_exc())
+            
+            # Return generic error to user
+            return Response(
+                {"error": "Authentication failed"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
 
 
